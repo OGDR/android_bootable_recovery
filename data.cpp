@@ -739,7 +739,7 @@ void DataManager::SetDefaultValues() {
 
 #ifdef TW_HAS_MTP
   consts_["tw_has_mtp"] = true;
-  persist_["tw_mtp_enabled"] = true;
+  persist_["tw_mtp_enabled"] = false;
   persist_["tw_mtp_debug"] = false;
 #else
   LOGINFO("TW_EXCLUDE_MTP := true\n");
