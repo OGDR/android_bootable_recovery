@@ -448,7 +448,6 @@ cc_binary {
 
     cflags: [
         "-DTW_USE_NEW_MINADBD",
-        "-DTW_WORKAROUND_BACKUP_BUG",
         "-DHAVE_CAPABILITIES",
     ],
 
