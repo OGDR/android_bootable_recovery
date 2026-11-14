@@ -161,7 +161,7 @@ tar_extract_file(TAR *t, const char *realname, const char *prefix, const int *pr
 	i = tar_set_file_perms(t, realname);
 	if (i != 0) {
 		fprintf(stderr, "tar_extract_file(): failed to set permissions on %s !!!\n", realname);
-		return i;
+		//return i; /* non-fatal */
 	}
 
 	if((t->options & TAR_STORE_SELINUX) && t->th_buf.selinux_context != NULL)
@@ -535,22 +535,22 @@ tar_extract_dir(TAR *t, const char *realname)
 #endif
 			if (setxattr(realname, "user.default", NULL, 0, 0) < 0) {
 				fprintf(stderr, "tar_extract_file(): failed to restore android user.default to file %s !!!\n", realname);
-				return -1;
+				//return -1; /* non-fatal on FBE restore */
 			}
 		}
 		if (t->th_buf.has_user_cache) {
 #if 1 //def DEBUG
 			LOG("tar_extract_file(): restoring android user.inode_cache xattr to %s\n", realname);
 #endif
-			if (write_path_inode(realname, "cache", "user.inode_cache"))
-				return -1;
+		if (write_path_inode(realname, "cache", "user.inode_cache"))
+    fprintf(stderr, "tar_extract_file(): failed to restore user.inode_cache on %s (ignored)\n", realname);
 		}
 		if (t->th_buf.has_user_code_cache) {
 #if 1 //def DEBUG
 			LOG("tar_extract_file(): restoring android user.inode_code_cache xattr to %s\n", realname);
 #endif
 			if (write_path_inode(realname, "code_cache", "user.inode_code_cache"))
-				return -1;
+    fprintf(stderr, "tar_extract_file(): failed to restore user.inode_code_cache on %s (ignored)\n", realname);
 		}
 	}
 
