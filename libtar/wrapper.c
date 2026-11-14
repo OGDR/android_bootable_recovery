@@ -81,8 +81,14 @@ tar_extract_all(TAR *t, char *prefix, const int *progress_fd)
 		LOG("    tar_extract_all(): calling tar_extract_file(t, "
 		       "\"%s\")\n", buf);
 #endif
-		if (tar_extract_file(t, buf, prefix, progress_fd) != 0)
-			return -1;
+		if (tar_extract_file(t, buf, prefix, progress_fd) != 0) {
+			fprintf(stderr, "tar_extract_all(): failed on '%s' (skipped)\n", buf);
+			if (TH_ISREG(t) && tar_skip_regfile(t) != 0) {
+				fprintf(stderr, "tar_extract_all(): failed to skip payload for '%s'\n", buf);
+				return -1;
+			}
+			continue;
+		}
 	}
 
 	return (i == 1 ? 0 : -1);
