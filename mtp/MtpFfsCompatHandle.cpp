@@ -34,6 +34,7 @@
 
 #include "PosixAsyncIO.h"
 #include "MtpFfsCompatHandle.h"
+#include "MtpDescriptors.h"
 #include "mtp.h"
 
 #define FUNCTIONFS_ENDPOINT_ALLOC       _IOR('g', 231, __u32)
@@ -110,6 +111,20 @@ int MtpFfsCompatHandle::readHandle(int fd, void* data, size_t len) {
 }
 
 int MtpFfsCompatHandle::start(bool ptp) {
+    // Reopen ep0 if a previous failed attempt closed it.
+    if (mControl < 0) {
+        mControl.reset(TEMP_FAILURE_RETRY(open(ptp ? FFS_PTP_EP0 : FFS_MTP_EP0, O_RDWR)));
+        if (mControl < 0) {
+            PLOG(ERROR) << (ptp ? FFS_PTP_EP0 : FFS_MTP_EP0) << ": cannot open control ep";
+            return -1;
+        }
+    }
+
+    // Write descriptors before opening endpoints. FunctionFS creates
+    // ep1/ep2/ep3 and signals readiness after receiving these descriptors.
+    if (!writeDescriptors(ptp))
+        return -1;
+
     if (!openEndpoints(ptp))
         return -1;
 
