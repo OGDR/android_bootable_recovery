@@ -2261,10 +2261,11 @@ bool TWPartition::BackupTar(PartitionSettings* part_settings, pid_t* tar_fork_pi
   gui_msg(Msg(msg::kWarning,
               "backup_storage_warning=Backups of {1} do not include any files in internal storage such as pictures or downloads.")(
       display_name_));
-#else
-    LOGERR(
-      "Backups of %s are currently BROKEN in the 16 branch. There is little point in making backups of %s\n\n",
-      display_name_.c_str(), display_name_.c_str());
+#else 
+//   Data backup works on Kansas — skip 16-branch BROKEN message
+//    LOGERR(
+//      "Backups of %s are currently BROKEN in the 16 branch. There is little point in making backups of %s\n\n",
+//      display_name_.c_str(), display_name_.c_str());
 #endif
 
   if (mount_point_ == "/data" && DataManager::GetIntValue(TW_IS_FBE)) {
